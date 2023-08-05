@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 
 
 class UsuarioServiceTest {
-    @Mock
+    @Mock //esta anotação indica que esta classe sera uma instancia simulada
     private UsuarioRepository usuarioRepository;
     @Mock
     private Usuario usuario;
@@ -36,33 +36,46 @@ class UsuarioServiceTest {
     private UsuarioRequestDTO usuarioRequestDTO;
     @Mock
     private ModelMapper modelMapper;
-    @InjectMocks
+    @InjectMocks //Injeta automaticamente objetos simulados. Permitindo uso de dependencias simuladas
     private UsuarioService userService;
-    @BeforeEach
-    public void setup(){
-        MockitoAnnotations.openMocks(this);
-        usuario = new Usuario();
-        usuarioResponseDTO = new UsuarioResponseDTO();
-        usuarioRequestDTO = new UsuarioRequestDTO();
+    @BeforeEach //método que será executado antes de cada teste dentro de uma classe de testes.
+    public void setup(){ // sera executado antes de cada teste
+        MockitoAnnotations.openMocks(this); // inicializar mock criados com @Mock
+        usuario = new Usuario(); //criando objetos reais para teste
+        usuarioResponseDTO = new UsuarioResponseDTO();//criando objetos reais para teste
+        usuarioRequestDTO = new UsuarioRequestDTO();//criando objetos reais para teste
+        // metodo setup garante que que a classe sob teste comece cada teste em um estado conhecido e limpo.
     }
 
+    //usado para testes parametrizados, onde conseguimos realizar o mesmo teste com ids diferentes.
     private static Stream<Long> idsParaTeste(){
         return Stream.of(1L,2L,3L);
     }
 
+
     @Test
     @DisplayName("Teste para salvar um usuario")
     public void testSalvar(){
+        //configurando o comportamento do mock de um maper entre request e entidade e esperando que o retorno
+        // esperado, seja a entidade
         when(modelMapper.map(usuarioRequestDTO, Usuario.class)).thenReturn(usuario);
+
+        // configurando o comportamento do mock, para quando e chamado com o save, ele retornar o proprio objeto usuario
         when(usuarioRepository.save(usuario)).thenReturn(usuario);
+
+        //configurando o comportamento do mock, estamos mapeando para que a etidade retorne um response
         when(modelMapper.map(usuario, UsuarioResponseDTO.class)).thenReturn(usuarioResponseDTO);
 
+        //invocanto metodo do service. Para teste isolado.
         UsuarioResponseDTO salvarUsuarioResponseDTO = userService.salvar(usuarioRequestDTO);
 
+        //verificando se o valor retornado e um objeto não nulo;
         assertNotNull(salvarUsuarioResponseDTO);
 
         verify(usuarioRepository, times(1)).save(usuario);
+
         verify(modelMapper, times(1)).map(usuarioRequestDTO, Usuario.class);
+
         verify(modelMapper, times(1)).map(usuario, UsuarioResponseDTO.class);
     }
 
