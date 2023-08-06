@@ -26,7 +26,7 @@ public class UsuarioService {
 
 	public UsuarioResponseDTO salvar(UsuarioRequestDTO usuarioRequestDTO)  {
 			if (usuarioRepository.findByNome(usuarioRequestDTO.getNome()).isPresent()) {
-				throw new BadRequestException("Este nome para usuario ja existe");
+				throw new BadRequestException("Este nome para Usuario ja existe");
 			}
 			Usuario usuario = this.modelMapper.map(usuarioRequestDTO, Usuario.class);
 			usuario = this.usuarioRepository.save(usuario);
